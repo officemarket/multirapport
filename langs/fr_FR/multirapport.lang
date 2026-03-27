@@ -1,0 +1,90 @@
+# Translation file
+
+#
+# Generic
+#
+
+# Module label 'ModuleMultiRapportName'
+ModuleMultiRapportName = MultiRapport
+# Module description 'ModuleMultiRapportDesc'
+ModuleMultiRapportDesc = MultiRapport description
+
+#
+# Admin page
+#
+MultiRapportSetup = MultiRapport setup
+Settings = Settings
+MultiRapportSetupPage = MultiRapport setup page
+NewSection=New section
+MULTIRAPPORT_MYPARAM1 = My param 1
+MULTIRAPPORT_MYPARAM1Tooltip = My param 1 tooltip
+MULTIRAPPORT_MYPARAM2=My param 2
+MULTIRAPPORT_MYPARAM2Tooltip=My param 2 tooltip
+
+
+#
+# About page
+#
+About = About
+MultiRapportAbout = About MultiRapport
+MultiRapportAboutPage = MultiRapport about page
+
+#
+# Sample page
+#
+MultiRapportArea = Home MultiRapport
+MyPageName = My page name
+
+#
+# Sample widget
+#
+MyWidget = My widget
+MyWidgetDescription = My widget description
+
+#
+# Credit Status Feature
+#
+MarkAsCredit = Marquer comme Credit
+ClassifyAsCredit = Classer comme Credit
+ConfirmClassifyAsCredit = Êtes-vous sûr de vouloir classer la facture <b>%s</b> comme Credit ?
+ConfirmMarkAsCreditMass = Êtes-vous sûr de vouloir classer les factures sélectionnées comme Credit ?
+BillStatusCredit = Credit
+ShortBillStatusCredit = Credit
+BillShortStatusCredit = Credit
+InvoiceMarkedAsCredit = Facture classée comme Credit avec succès
+InvoicesMarkedAsCredit = %s facture(s) classée(s) comme Credit
+ErrorMarkingAsCredit = Erreur lors du classement comme Credit
+SomeInvoicesNotMarkedAsCredit = Certaines factures n'ont pas pu être classées comme Credit
+InvoiceMustBeUnpaid = La facture doit être impayée pour être classée comme Credit
+ErrorInvoiceNotFound = Facture non trouvée (ID: %s)
+CreditStatusRemovedOnPayment = Statut Credit retiré car la facture a été payée
+CreditStatusHelp = Le statut Credit indique que la facture est en attente de crédit/remboursement. Fonctionnellement similaire à Impayé mais visuellement distinct.
+
+#
+# Permissions
+#
+Permission23120001 = Lire les objets de MultiRapport
+Permission23120002 = Créer/Modifier les objets de MultiRapport
+Permission23120003 = Supprimer les objets de MultiRapport
+Permission23120004 = Classer les factures comme Credit
+
+#
+# Report Page
+#
+MultiRapportReport = Rapport MultiRapport
+FinancialMetrics = Métriques Financières
+TotalRevenue = Revenu Total (TTC)
+TotalPaidInvoices = Total Factures Payées
+TotalUnpaidInvoices = Total Factures Non Payées
+TotalExpenses = Total des notes de frais
+TotalCreditStatusInvoices = Total factures en état Crédit (non payées)
+TotalCreditPaidInvoices = Total factures Crédit payées
+CreditPaidInvoicesList = Liste des Factures Crédit Payées
+HourStart = Heure Début
+HourEnd = Heure Fin
+GeneratePDF = Générer PDF
+PDFReportTitle = Rapport Financier MultiRapport
+ReportPeriod = Période du rapport
+ReportGeneratedOn = Rapport généré le
+InvoicesSelected = Factures sélectionnées
+PDFGenerationNotImplemented = Génération PDF non encore implémentée

@@ -1,0 +1,69 @@
+# Translation file
+
+#
+# Generic
+#
+
+# Module label 'ModuleMultiRapportName'
+ModuleMultiRapportName = MultiRapport
+# Module description 'ModuleMultiRapportDesc'
+ModuleMultiRapportDesc = MultiRapport description
+
+#
+# Admin page
+#
+MultiRapportSetup = MultiRapport setup
+Settings = Settings
+MultiRapportSetupPage = MultiRapport setup page
+NewSection=New section
+MULTIRAPPORT_MYPARAM1 = My param 1
+MULTIRAPPORT_MYPARAM1Tooltip = My param 1 tooltip
+MULTIRAPPORT_MYPARAM2=My param 2
+MULTIRAPPORT_MYPARAM2Tooltip=My param 2 tooltip
+
+
+#
+# About page
+#
+About = About
+MultiRapportAbout = About MultiRapport
+MultiRapportAboutPage = MultiRapport about page
+
+#
+# Sample page
+#
+MultiRapportArea = Home MultiRapport
+MyPageName = My page name
+
+#
+# Sample widget
+#
+MyWidget = My widget
+MyWidgetDescription = My widget description
+
+#
+# Credit Status Feature
+#
+MarkAsCredit = Mark as Credit
+ClassifyAsCredit = Classify as Credit
+ConfirmClassifyAsCredit = Are you sure you want to classify invoice <b>%s</b> as Credit?
+ConfirmMarkAsCreditMass = Are you sure you want to mark selected invoices as Credit?
+BillStatusCredit = Credit
+ShortBillStatusCredit = Credit
+BillShortStatusCredit = Credit
+InvoiceMarkedAsCredit = Invoice successfully marked as Credit
+InvoicesMarkedAsCredit = %s invoice(s) marked as Credit
+ErrorMarkingAsCredit = Error while marking as Credit
+SomeInvoicesNotMarkedAsCredit = Some invoices could not be marked as Credit
+InvoiceMustBeUnpaid = Invoice must be unpaid to be classified as Credit
+ErrorInvoiceNotFound = Invoice not found (ID: %s)
+CreditStatusRemovedOnPayment = Credit status removed because invoice was paid
+CreditStatusHelp = The Credit status indicates that the invoice is awaiting credit/refund. Functionally similar to Unpaid but visually distinct.
+
+#
+# Permissions
+#
+Permission23120001 = Read MultiRapport objects
+Permission23120002 = Create/Update MultiRapport objects
+Permission23120003 = Delete MultiRapport objects
+Permission23120004 = Classify invoices as Credit

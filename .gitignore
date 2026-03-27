@@ -1,0 +1,33 @@
+# Fichiers système
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Dépendances (si applicable)
+node_modules/
+vendor/
+
+# Variables d'environnement
+.env
+.env.local
+.env.*.local
+
+# Fichiers de configuration locaux
+config.local.php
+config.local.js
+
+# Répertoires de cache
+cache/
+tmp/
+temp/
+
+# Fichiers de build générés
+*.min.js
+*.min.css
+
+# Fichiers d'upload utilisateurs (sensibles)
+uploads/
