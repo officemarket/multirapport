@@ -134,8 +134,27 @@ class ActionsMultiRapport
 
 		// Handle individual action on invoice card
 		if (in_array($parameters['currentcontext'], array('invoicecard', 'facturecard'))) {
-			if ($action == 'classifyascredit' && $confirm === 'yes') {
-				$this->processClassifyAsCredit($object);
+			if ($action == 'classifyascredit') {
+				if ($confirm === 'yes') {
+					// User confirmed: execute the action
+					$this->processClassifyAsCredit($object);
+					return 1;
+				} else {
+					// Show a simple PHP confirmation form (avoids the JS register error)
+					print '<form method="POST" action="'.$_SERVER['PHP_SELF'].'">';
+					print '<input type="hidden" name="token" value="'.newToken().'">';
+					print '<input type="hidden" name="action" value="classifyascredit">';
+					print '<input type="hidden" name="id" value="'.$object->id.'">';
+					print '<input type="hidden" name="confirm" value="yes">';
+					print '<div class="confirmmessage" style="padding:20px; background:#fff3cd; border:1px solid #ffc107; border-radius:4px; margin:10px 0;">';
+					print '<strong>'.$langs->trans('ClassifyAsCredit').'</strong><br><br>';
+					print $langs->trans('ConfirmClassifyAsCredit').'<br><br>';
+					print '<input type="submit" class="button" value="'.$langs->trans('Yes').'">';
+					print ' <a href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'" class="button button-secondary">'.$langs->trans('No').'</a>';
+					print '</div>';
+					print '</form>';
+					return 1; // Prevent further processing of this action
+				}
 			}
 		}
 
@@ -212,14 +231,11 @@ class ActionsMultiRapport
 				// Check if not already marked as credit (using custom field)
 				$iscredit = $this->isInvoiceMarkedAsCredit($object->id);
 				if (!$iscredit) {
-					print dolGetButtonAction(
-						$langs->trans('ClassifyAsCredit'),
-						'',
-						'default',
-						$_SERVER['PHP_SELF'].'?id='.$object->id.'&action=classifyascredit&token='.newToken(),
-						'',
-						true
-					);
+					// Use a plain <a> link instead of dolGetButtonAction to avoid
+					// the JS "Cannot read properties of undefined (reading 'register')" error
+					// that occurs when the popup confirmation manager is not yet initialised.
+					$url = $_SERVER['PHP_SELF'].'?id='.$object->id.'&action=classifyascredit&token='.newToken();
+					print '<a class="butAction" href="'.dol_escape_htmltag($url).'">'.dol_escape_htmltag($langs->trans('ClassifyAsCredit')).'</a>';
 				}
 			}
 		}

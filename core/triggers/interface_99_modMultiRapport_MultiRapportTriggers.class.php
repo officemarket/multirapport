@@ -45,7 +45,7 @@ class InterfaceMultiRapportTriggers extends DolibarrTriggers
 		$this->name = preg_replace('/^Interface/i', '', get_class($this));
 		$this->family = "multirapport";
 		$this->description = "MultiRapport module triggers: handle credit status removal on payment";
-		$this->version = self::VERSIONS[' Dolibarr']; // Possible values: VERSIONS[' Dolibarr'], VERSIONS['experimental'], VERSIONS['development']
+		$this->version = self::VERSIONS['dolibarr']; // Possible values: VERSIONS['dolibarr'], VERSIONS['experimental'], VERSIONS['development']
 		$this->picto = 'bill';
 	}
 
