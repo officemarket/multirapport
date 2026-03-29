@@ -340,7 +340,7 @@ class modMultiRapport extends DolibarrModules
 			'langs' => 'multirapport@multirapport',
 			'position' => 1000 + $r,
 			'enabled' => 'isModEnabled("multirapport")',
-			'perms' => '$user->hasRight("multirapport", "read")',
+			'perms' => '$user->hasRight("multirapport", "multirapport", "read")',
 			'user' => 2,
 		);
 		/* END MODULEBUILDER TOPMENU */
@@ -356,7 +356,7 @@ class modMultiRapport extends DolibarrModules
 			'langs' => 'multirapport@multirapport',
 			'position' => 1000 + $r,
 			'enabled' => 'isModEnabled("multirapport")',
-			'perms' => '$user->hasRight("multirapport", "read")',
+			'perms' => '$user->hasRight("multirapport", "multirapport", "read")',
 			'user' => 2,
 		);
 		/* END MODULEBUILDER LEFTMENU REPORT */

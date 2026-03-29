@@ -99,7 +99,7 @@ $date_end_ts = dol_stringtotime($date_end . ' ' . sprintf('%02d', $hour_end) . '
 if (!isModEnabled('multirapport')) {
     accessforbidden('Module not enabled');
 }
-if (!$user->admin && !$user->hasRight('multirapport', 'read')) {
+if (!$user->hasRight('multirapport', 'multirapport', 'read')) {
     accessforbidden();
 }
 

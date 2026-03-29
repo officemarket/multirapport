@@ -93,7 +93,7 @@ $hookmanager->initHooks(array('multirapportindex'));
 if (!isModEnabled('multirapport')) {
 	accessforbidden('Module not enabled');
 }
-if (!$user->admin && !$user->hasRight('multirapport', 'read')) {
+if (!$user->hasRight('multirapport', 'multirapport', 'read')) {
 	accessforbidden();
 }
 //if ($user->socid > 0) accessforbidden();
