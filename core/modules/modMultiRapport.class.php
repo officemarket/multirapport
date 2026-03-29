@@ -71,7 +71,7 @@ class modMultiRapport extends DolibarrModules
 		$this->editor_squarred_logo = '';
 
 		// Version
-		$this->version = '1.1.1';
+		$this->version = '2.0.1';
 
 		// Key used in llx_const table to save module status
 		$this->const_name = 'MAIN_MODULE_'.strtoupper($this->name);
