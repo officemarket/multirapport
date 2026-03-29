@@ -11,15 +11,11 @@ ModuleMultiRapportDesc = MultiRapport description
 
 #
 # Admin page
-#
-MultiRapportSetup = MultiRapport setup
-Settings = Settings
-MultiRapportSetupPage = MultiRapport setup page
-NewSection=New section
-MULTIRAPPORT_MYPARAM1 = My param 1
-MULTIRAPPORT_MYPARAM1Tooltip = My param 1 tooltip
-MULTIRAPPORT_MYPARAM2=My param 2
-MULTIRAPPORT_MYPARAM2Tooltip=My param 2 tooltip
+MultiRapportSetup = Configuration MultiRapport
+Settings = Paramètres
+MultiRapportSetupPage = Page de configuration de MultiRapport
+CreditStatusConfiguration = Configuration du statut Crédit
+MULTIRAPPORT_INVOICE_CREDIT_STATUS_ENABLED = Activer le statut Crédit pour les factures
 
 
 #
@@ -88,3 +84,12 @@ ReportPeriod = Période du rapport
 ReportGeneratedOn = Rapport généré le
 InvoicesSelected = Factures sélectionnées
 PDFGenerationNotImplemented = Génération PDF non encore implémentée
+MultiRapportMetrics = Métriques MultiRapport
+CurrentMonth = Mois courant
+FullReport = Voir le rapport complet
+CreditStatusDetails = Détails Statut Crédit
+RevenueVsExpenses = Revenu vs Dépenses
+TotalMargin = Marge Totale
+ReadMultiRapportReports = Lire les rapports MultiRapport
+ExportMultiRapportReports = Exporter les rapports MultiRapport
+MarkInvoiceAsCredit = Marquer une facture comme Crédit

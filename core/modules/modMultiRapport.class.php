@@ -52,42 +52,32 @@ class modMultiRapport extends DolibarrModules
 		// Key text used to identify module (for permissions, menus, etc...)
 		$this->rights_class = 'multirapport';
 
-		// Family can be 'base' (core modules),'crm','financial','hr','projects','products','ecm','technic' (transverse modules),'interface' (link with external tools),'other','...'
-		// It is used to group modules by family in module setup page
-		$this->family = "other";
+		// Family can be 'base', 'crm', 'financial', 'hr', 'projects', 'products', 'ecm', 'technic', 'interface', 'other'
+		$this->family = "financial";
 
-		// Module position in the family on 2 digits ('01', '10', '20', ...)
+		// Module position in the family
 		$this->module_position = '90';
 
-		// Gives the possibility for the module, to provide his own family info and position of this family (Overwrite $this->family and $this->module_position. Avoid this)
-		//$this->familyinfo = array('myownfamily' => array('position' => '01', 'label' => $langs->trans("MyOwnFamily")));
-		// Module label (no space allowed), used if translation string 'ModuleMultiRapportName' not found (MultiRapport is name of module).
+		// Module label
 		$this->name = preg_replace('/^mod/i', '', get_class($this));
 
-		// DESCRIPTION_FLAG
-		// Module description, used if translation string 'ModuleMultiRapportDesc' not found (MultiRapport is name of module).
+		// Module description
 		$this->description = "MultiRapportDescription";
-		// Used only if file README.md and README-LL.md not found.
 		$this->descriptionlong = "MultiRapportDescription";
 
 		// Author
 		$this->editor_name = 'Office Market Supply';
-		$this->editor_url = 'https://officemarket.supply';		// Must be an external online web site
-		$this->editor_squarred_logo = '';					// Must be image filename into the module/img directory followed with @modulename. Example: 'myimage.png@multirapport'
+		$this->editor_url = 'https://officemarket.supply';
+		$this->editor_squarred_logo = '';
 
-		// Possible values for version are: 'development', 'experimental', 'dolibarr', 'dolibarr_deprecated', 'experimental_deprecated' or a version string like 'x.y.z'
-		$this->version = '1.0.1';
-		// Url to the file with your last numberversion of this module
-		//$this->url_last_version = 'http://www.example.com/versionmodule.txt';
+		// Version
+		$this->version = '1.1.1';
 
-		// Key used in llx_const table to save module status enabled/disabled (where MULTIRAPPORT is value of property name of module in uppercase)
+		// Key used in llx_const table to save module status
 		$this->const_name = 'MAIN_MODULE_'.strtoupper($this->name);
 
-		// Name of image file used for this module.
-		// If file is in theme/yourtheme/img directory under name object_pictovalue.png, use this->picto='pictovalue'
-		// If file is in module/img directory under name object_pictovalue.png, use this->picto='pictovalue@module'
-		// To use a supported fa-xxx css style of font awesome, use this->picto='xxx'
-		$this->picto = 'fa-file';
+		// Name of image file used for this module
+		$this->picto = 'fa-file-invoice-dollar';
 
 		// Define some features supported by module (triggers, login, substitutions, menus, css, etc...)
 		$this->module_parts = array(
@@ -263,12 +253,11 @@ class modMultiRapport extends DolibarrModules
 		// Add here list of php file(s) stored in multirapport/core/boxes that contains a class to show a widget.
 		/* BEGIN MODULEBUILDER WIDGETS */
 		$this->boxes = array(
-			//  0 => array(
-			//      'file' => 'multirapportwidget1.php@multirapport',
-			//      'note' => 'Widget provided by MultiRapport',
-			//      'enabledbydefaulton' => 'Home',
-			//  ),
-			//  ...
+			 0 => array(
+			     'file' => 'multirapport_widget.php@multirapport',
+			     'note' => 'Widget providing key metrics',
+			     'enabledbydefaulton' => 'Home',
+			 ),
 		);
 		/* END MODULEBUILDER WIDGETS */
 
@@ -302,25 +291,27 @@ class modMultiRapport extends DolibarrModules
 		$r = 0;
 		// Add here entries to declare new permissions
 		/* BEGIN MODULEBUILDER PERMISSIONS */
+		// [4]=perms (KEY_FIRST_LEVEL), [5]=subperms (KEY_SECOND_LEVEL). Both columns map to $user->rights->multirapport in loadRights().
+		// perms must NOT be empty or DolibarrModules::insert_permissions skips the row (no entry in llx_rights_def).
 		$this->rights[$r][0] = $this->numero . sprintf("%02d", 1); // Permission id (must not be already used)
 		$this->rights[$r][1] = 'Read objects of MultiRapport'; // Permission label
-		$this->rights[$r][4] = 'multirapport';
-		$this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->hasRight('multirapport', 'read'))
+		$this->rights[$r][4] = 'read';
+		$this->rights[$r][5] = ''; // if ($user->hasRight('multirapport', 'read'))
 		$r++;
 		$this->rights[$r][0] = $this->numero . sprintf("%02d", 2); // Permission id (must not be already used)
 		$this->rights[$r][1] = 'Create/Update objects of MultiRapport'; // Permission label
-		$this->rights[$r][4] = 'multirapport';
-		$this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->hasRight('multirapport', 'write'))
+		$this->rights[$r][4] = 'write';
+		$this->rights[$r][5] = ''; // if ($user->hasRight('multirapport', 'write'))
 		$r++;
 		$this->rights[$r][0] = $this->numero . sprintf("%02d", 3); // Permission id (must not be already used)
 		$this->rights[$r][1] = 'Delete objects of MultiRapport'; // Permission label
-		$this->rights[$r][4] = 'multirapport';
-		$this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->hasRight('multirapport', 'delete'))
+		$this->rights[$r][4] = 'delete';
+		$this->rights[$r][5] = ''; // if ($user->hasRight('multirapport', 'delete'))
 		$r++;
 		$this->rights[$r][0] = $this->numero . sprintf("%02d", 4); // Permission id (must not be already used)
 		$this->rights[$r][1] = 'Classify invoices as Credit'; // Permission label
 		$this->rights[$r][4] = 'invoice';
-		$this->rights[$r][5] = 'classifycredit'; // In php code, permission will be checked by test if ($user->hasRight('multirapport', 'invoice', 'classifycredit'))
+		$this->rights[$r][5] = 'classifycredit'; // if ($user->hasRight('multirapport', 'invoice', 'classifycredit'))
 		$r++;
 		/* END MODULEBUILDER PERMISSIONS */
 
@@ -340,13 +331,13 @@ class modMultiRapport extends DolibarrModules
 			'langs' => 'multirapport@multirapport',
 			'position' => 1000 + $r,
 			'enabled' => 'isModEnabled("multirapport")',
-			'perms' => '$user->hasRight("multirapport", "multirapport", "read")',
+			'perms' => '$user->hasRight("multirapport", "read")',
 			'user' => 2,
 		);
 		/* END MODULEBUILDER TOPMENU */
 
 		/* BEGIN MODULEBUILDER LEFTMENU REPORT */
-		$this->menu[$r++]=array(
+		$this->menu[$r++] = array(
 			'fk_menu' => 'fk_mainmenu=multirapport',
 			'type' => 'left',
 			'titre' => 'MultiRapportReport',
@@ -356,7 +347,7 @@ class modMultiRapport extends DolibarrModules
 			'langs' => 'multirapport@multirapport',
 			'position' => 1000 + $r,
 			'enabled' => 'isModEnabled("multirapport")',
-			'perms' => '$user->hasRight("multirapport", "multirapport", "read")',
+			'perms' => '$user->hasRight("multirapport", "read")',
 			'user' => 2,
 		);
 		/* END MODULEBUILDER LEFTMENU REPORT */
@@ -374,7 +365,7 @@ class modMultiRapport extends DolibarrModules
 			'langs' => 'multirapport@multirapport',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 1000 + $r,
 			'enabled' => 'isModEnabled("multirapport")', // Define condition to show or hide menu entry. Use 'isModEnabled("multirapport")' if entry must be visible if module is enabled.
-			'perms' => '$user->hasRight("multirapport", "myobject", "read")',
+			'perms' => '$user->hasRight("multirapport", "read")',
 			'target' => '',
 			'user' => 2,				                // 0=Menu for internal users, 1=external users, 2=both
 			'object' => 'MyObject'

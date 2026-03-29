@@ -73,3 +73,21 @@ span.badge.status8:hover {
     background-color: rgba(156, 39, 176, 0.1);
     border-color: #9c27b0;
 }
+/* Dashboard Cards */
+.box-flex-container {
+    display: flex;
+    flex-wrap: wrap;
+    margin: -10px;
+}
+.box-flex-item {
+    transition: transform 0.2s;
+}
+.box-flex-item:hover {
+    transform: translateY(-5px);
+}
+.box {
+    overflow: hidden;
+}
+.opacitymedium {
+    opacity: 0.6;
+}

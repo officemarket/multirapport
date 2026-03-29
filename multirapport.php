@@ -109,9 +109,10 @@ if ($date_end_year && $date_end_month && $date_end_day) {
 if (!isModEnabled('multirapport')) {
     accessforbidden('Module not enabled');
 }
-if (!$user->hasRight('multirapport', 'multirapport', 'read')) {
+if (!$user->hasRight('multirapport', 'read')) {
     accessforbidden();
 }
+restrictedArea($user, 'multirapport');
 
 // Initialize a technical object to manage hooks
 $hookmanager->initHooks(array('multirapportcard'));
@@ -242,6 +243,24 @@ if (!empty($date_start) && !empty($date_end) && $date_start_ts && $date_end_ts) 
         }
         $db->free($resql);
     }
+
+    // 8. Total Margin (if module marge enabled)
+    if (isModEnabled('margin')) {
+        $sql = "SELECT SUM(f.total_ht - f.buy_price_ht) as margin";
+        $sql .= " FROM " . $db->prefix() . "facturedet as f";
+        $sql .= " LEFT JOIN " . $db->prefix() . "facture as if ON f.fk_facture = if.rowid";
+        $sql .= " WHERE if.datec >= '" . $db->idate($date_start_ts) . "'";
+        $sql .= " AND if.datec <= '" . $db->idate($date_end_ts) . "'";
+        $sql .= " AND if.fk_statut IN (1, 2)";
+        $sql .= " AND if.entity IN (" . getEntity('invoice') . ")";
+        
+        $resql = $db->query($sql);
+        if ($resql) {
+            $obj = $db->fetch_object($resql);
+            $metrics['total_margin'] = $obj->margin ? (float) $obj->margin : 0;
+            $db->free($resql);
+        }
+    }
     
     $db->commit();
 }
@@ -275,7 +294,7 @@ if ($action == 'generatepdf') {
 }
 
 // Header
-llxHeader();
+llxHeader('', $langs->trans('MultiRapportReport'), '', '', 0, 0, array('/includes/nnnick/chartjs/dist/chart.min.js'), array(), '', '');
 
 // Print page title
 print load_fiche_titre($langs->trans('MultiRapportReport'), '', 'multirapport.png@multirapport');
@@ -325,64 +344,128 @@ print '</div>';
 print '<div class="center">';
 print '<input type="submit" class="button" value="' . $langs->trans('Refresh') . '">';
 print '<input type="submit" class="button" name="action" value="generatepdf">';
+
+if (!empty($date_start_ts) && !empty($date_end_ts) && $user->hasRight('multirapport', 'read')) {
+    $export_url = 'rapport_export.php?date_start=' . $date_start_ts . '&date_end=' . $date_end_ts;
+    print ' <a href="' . $export_url . '" class="button">' . $langs->trans('Export') . ' (CSV)</a>';
+}
+
 print '</div>';
 
 print '</form>';
 
 // Results section
 print '<br>';
-print '<div class="fichecenter">';
 
-// Metrics cards
-print '<div class="fichethirdleft">';
-print '<div class="div-table-responsive-no-min">';
-print '<table class="noborder centpercent">';
-print '<tr class="liste_titre">';
-print '<td colspan="2">' . $langs->trans('FinancialMetrics') . '</td>';
-print '</tr>';
+if (!empty($metrics)) {
+    // Modern Cards for key metrics
+    print '<div class="fichecenter">';
+    print '<div class="div-table-responsive-no-min">';
+    print '<div class="box-flex-container">';
+    
+    // Revenue Card
+    print '<div class="box-flex-item" style="flex: 1 1 200px; padding: 10px;">';
+    print '<div class="box" style="background: #fff; border-top: 3px solid #6b4c9a; padding: 15px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">';
+    print '<div class="opacitymedium">' . $langs->trans('TotalRevenue') . '</div>';
+    print '<div style="font-size: 1.8em; font-weight: bold; color: #6b4c9a;">' . price($metrics['total_revenue'] ?? 0) . '</div>';
+    print '</div>';
+    print '</div>';
+    
+    // Paid Card
+    print '<div class="box-flex-item" style="flex: 1 1 200px; padding: 10px;">';
+    print '<div class="box" style="background: #fff; border-top: 3px solid #28a745; padding: 15px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">';
+    print '<div class="opacitymedium">' . $langs->trans('TotalPaidInvoices') . '</div>';
+    print '<div style="font-size: 1.8em; font-weight: bold; color: #28a745;">' . price($metrics['total_paid'] ?? 0) . '</div>';
+    print '</div>';
+    print '</div>';
+    
+    // Unpaid Card
+    print '<div class="box-flex-item" style="flex: 1 1 200px; padding: 10px;">';
+    print '<div class="box" style="background: #fff; border-top: 3px solid #dc3545; padding: 15px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">';
+    print '<div class="opacitymedium">' . $langs->trans('TotalUnpaidInvoices') . '</div>';
+    print '<div style="font-size: 1.8em; font-weight: bold; color: #dc3545;">' . price($metrics['total_unpaid'] ?? 0) . '</div>';
+    print '</div>';
+    print '</div>';
+    
+    // Expenses Card
+    print '<div class="box-flex-item" style="flex: 1 1 200px; padding: 10px;">';
+    print '<div class="box" style="background: #fff; border-top: 3px solid #ffc107; padding: 15px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">';
+    print '<div class="opacitymedium">' . $langs->trans('TotalExpenses') . '</div>';
+    print '<div style="font-size: 1.8em; font-weight: bold; color: #ffc107;">' . price($metrics['total_expenses'] ?? 0) . '</div>';
+    print '</div>';
+    print '</div>';
+    
+    print '</div>';
+    print '</div>';
+    print '</div>';
 
-// Total Revenue
-print '<tr class="oddeven">';
-print '<td>' . $langs->trans('TotalRevenue') . '</td>';
-print '<td class="right amount" style="font-weight:bold;">' . price($metrics['total_revenue'] ?? 0) . '</td>';
-print '</tr>';
+    // Charts Container
+    print '<div class="fichecenter" style="display: flex; flex-wrap: wrap;">';
+    
+    // Left side: Chart
+    print '<div style="flex: 1 1 50%; padding: 10px;">';
+    print '<canvas id="revenueChart" style="max-height: 350px; background: #fff; border-radius: 4px; padding: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);"></canvas>';
+    print '</div>';
+    
+    // Right side: Breakdown Table
+    print '<div style="flex: 1 1 40%; padding: 10px;">';
+    print '<div style="background: #fff; border-radius: 4px; padding: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">';
+    print '<table class="noborder centpercent">';
+    print '<tr class="liste_titre"><td colspan="2">' . $langs->trans('FinancialMetrics') . '</td></tr>';
+    print '<tr class="oddeven"><td>' . $langs->trans('TotalRevenue') . '</td><td class="right">' . price($metrics['total_revenue']) . '</td></tr>';
+    print '<tr class="oddeven"><td>' . $langs->trans('TotalExpenses') . '</td><td class="right">' . price($metrics['total_expenses']) . '</td></tr>';
+    if (isset($metrics['total_margin'])) {
+        print '<tr class="oddeven"><td>' . $langs->trans('TotalMargin') . '</td><td class="right" style="color:#28a745;">' . price($metrics['total_margin']) . '</td></tr>';
+    }
+    print '<tr class="liste_total"><td><strong>Net profit</strong></td><td class="right"><strong>' . price($metrics['total_revenue'] - $metrics['total_expenses']) . '</strong></td></tr>';
+    print '</table>';
+    
+    print '<br>';
+    
+    print '<table class="noborder centpercent">';
+    print '<tr class="liste_titre"><td colspan="2">' . $langs->trans('CreditStatusDetails') . '</td></tr>';
+    print '<tr class="oddeven"><td>' . $langs->trans('TotalCreditStatusInvoices') . '</td><td class="right" style="color:#cc6600;">' . price($metrics['total_credit_status'] ?? 0) . '</td></tr>';
+    print '<tr class="oddeven"><td>' . $langs->trans('TotalCreditPaidInvoices') . '</td><td class="right" style="color:#6b4c9a;">' . price($metrics['total_credit_paid'] ?? 0) . '</td></tr>';
+    print '</table>';
+    print '</div>';
+    print '</div>';
+    
+    print '</div>';
 
-// Total Paid
-print '<tr class="oddeven">';
-print '<td>' . $langs->trans('TotalPaidInvoices') . '</td>';
-print '<td class="right amount">' . price($metrics['total_paid'] ?? 0) . '</td>';
-print '</tr>';
-
-// Total Unpaid
-print '<tr class="oddeven">';
-print '<td>' . $langs->trans('TotalUnpaidInvoices') . '</td>';
-print '<td class="right amount">' . price($metrics['total_unpaid'] ?? 0) . '</td>';
-print '</tr>';
-
-// Total Expenses
-print '<tr class="oddeven">';
-print '<td>' . $langs->trans('TotalExpenses') . '</td>';
-print '<td class="right amount">' . price($metrics['total_expenses'] ?? 0) . '</td>';
-print '</tr>';
-
-// Total Credit Status (not paid yet)
-print '<tr class="oddeven" style="background-color:#ffe6cc;">';
-print '<td><strong>' . $langs->trans('TotalCreditStatusInvoices') . '</strong></td>';
-print '<td class="right amount" style="font-weight:bold; color:#cc6600;">' . price($metrics['total_credit_status'] ?? 0) . '</td>';
-print '</tr>';
-
-// Total Credit Paid
-print '<tr class="oddeven" style="background-color:#f0e6ff;">';
-print '<td><strong>' . $langs->trans('TotalCreditPaidInvoices') . '</strong></td>';
-print '<td class="right amount" style="font-weight:bold; color:#6b4c9a;">' . price($metrics['total_credit_paid'] ?? 0) . '</td>';
-print '</tr>';
-
-print '</table>';
-print '</div>';
-print '</div>';
+    // Chart JS script
+    print '<script type="text/javascript">
+        $(document).ready(function() {
+            var ctx = document.getElementById("revenueChart").getContext("2d");
+            new Chart(ctx, {
+                type: "bar",
+                data: {
+                    labels: ["' . $langs->trans('TotalRevenue') . '", "' . $langs->trans('TotalExpenses') . '", "Net"],
+                    datasets: [{
+                        label: "' . $langs->trans('Amount') . '",
+                        data: [' . ($metrics['total_revenue'] ?? 0) . ', ' . ($metrics['total_expenses'] ?? 0) . ', ' . (($metrics['total_revenue'] ?? 0) - ($metrics['total_expenses'] ?? 0)) . '],
+                        backgroundColor: ["#6b4c9a", "#ffc107", "#28a745"],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: true, text: "' . $langs->trans('RevenueVsExpenses') . '" }
+                    }
+                }
+            });
+        });
+    </script>';
+}
 
 // Right column - Credit Paid Invoices List
-print '<div class="fichetwothirdright">';
+print '<br>';
+print '<div class="fichecenter">';
 print '<div class="div-table-responsive-no-min">';
 print '<table class="noborder centpercent">';
 print '<tr class="liste_titre">';
@@ -420,8 +503,6 @@ if (!empty($credit_paid_invoices)) {
 
 print '</table>';
 print '</div>';
-print '</div>';
-
 print '</div>';
 
 // End of page
