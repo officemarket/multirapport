@@ -183,7 +183,7 @@ class ActionsMultiRapport
 		}
 
 		// Check permission
-		if (empty($user->rights->multirapport->invoice->classifycredit)) {
+		if (empty($user->rights->invoice->classifycredit) && empty($user->admin)) {
 			return 0;
 		}
 
@@ -219,7 +219,7 @@ class ActionsMultiRapport
 		}
 
 		// Check permission
-		if (empty($user->rights->multirapport->invoice->classifycredit)) {
+		if (empty($user->rights->invoice->classifycredit) && empty($user->admin)) {
 			return 0;
 		}
 
