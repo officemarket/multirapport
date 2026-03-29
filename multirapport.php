@@ -72,28 +72,38 @@ $form = new Form($db);
 
 // Get parameters
 $action = GETPOST('action', 'aZ09');
+$hour_start = (GETPOST('hour_start', 'alpha') !== '' ? GETPOST('hour_start', 'int') : 0);
+$hour_end = (GETPOST('hour_end', 'alpha') !== '' ? GETPOST('hour_end', 'int') : 23);
+
+// Handle date_start
 $date_start = GETPOST('date_start', 'alpha');
+$date_start_year = GETPOST('date_startyear', 'int');
+$date_start_month = GETPOST('date_startmonth', 'int');
+$date_start_day = GETPOST('date_startday', 'int');
+
+if ($date_start_year && $date_start_month && $date_start_day) {
+    $date_start_ts = dol_mktime($hour_start, 0, 0, $date_start_month, $date_start_day, $date_start_year);
+} elseif (!empty($date_start)) {
+    $date_start_ts = dol_stringtotime($date_start . ' ' . sprintf('%02d', $hour_start) . ':00:00');
+} else {
+    // Default: yesterday 00h
+    $date_start_ts = dol_mktime(0, 0, 0, date('m', dol_now()), date('d', dol_now()) - 1, date('Y', dol_now()));
+}
+
+// Handle date_end
 $date_end = GETPOST('date_end', 'alpha');
-$hour_start = GETPOST('hour_start', 'int');
-$hour_end = GETPOST('hour_end', 'int');
+$date_end_year = GETPOST('date_endyear', 'int');
+$date_end_month = GETPOST('date_endmonth', 'int');
+$date_end_day = GETPOST('date_endday', 'int');
 
-// Set default dates if not provided
-if (empty($date_start)) {
-    $date_start = dol_print_date(dol_time_plus_duree(dol_now(), -1, 'd'), '%Y-%m-%d');
+if ($date_end_year && $date_end_month && $date_end_day) {
+    $date_end_ts = dol_mktime($hour_end, 59, 59, $date_end_month, $date_end_day, $date_end_year);
+} elseif (!empty($date_end)) {
+    $date_end_ts = dol_stringtotime($date_end . ' ' . sprintf('%02d', $hour_end) . ':59:59');
+} else {
+    // Default: today 23h59
+    $date_end_ts = dol_mktime(23, 59, 59, date('m', dol_now()), date('d', dol_now()), date('Y', dol_now()));
 }
-if (empty($date_end)) {
-    $date_end = dol_print_date(dol_now(), '%Y-%m-%d');
-}
-if (empty($hour_start)) {
-    $hour_start = 0;
-}
-if (empty($hour_end)) {
-    $hour_end = 23;
-}
-
-// Convert dates to timestamps for SQL queries
-$date_start_ts = dol_stringtotime($date_start . ' ' . sprintf('%02d', $hour_start) . ':00:00');
-$date_end_ts = dol_stringtotime($date_end . ' ' . sprintf('%02d', $hour_end) . ':59:59');
 
 // Access control
 if (!isModEnabled('multirapport')) {
@@ -116,8 +126,8 @@ if (!empty($date_start) && !empty($date_end) && $date_start_ts && $date_end_ts) 
     
     // 1. Total Revenue (all invoices)
     $sql = "SELECT SUM(total_ttc) as total FROM " . $db->prefix() . "facture";
-    $sql .= " WHERE datef >= '" . $db->idate($date_start_ts) . "'";
-    $sql .= " AND datef <= '" . $db->idate($date_end_ts) . "'";
+    $sql .= " WHERE datec >= '" . $db->idate($date_start_ts) . "'";
+    $sql .= " AND datec <= '" . $db->idate($date_end_ts) . "'";
     $sql .= " AND fk_statut IN (" . Facture::STATUS_VALIDATED . ", " . Facture::STATUS_CLOSED . ")";
     $sql .= " AND entity IN (" . getEntity('invoice') . ")";
     
@@ -130,8 +140,8 @@ if (!empty($date_start) && !empty($date_end) && $date_start_ts && $date_end_ts) 
     
     // 2. Total Paid Invoices (status closed and paye = 1)
     $sql = "SELECT SUM(total_ttc) as total FROM " . $db->prefix() . "facture";
-    $sql .= " WHERE datef >= '" . $db->idate($date_start_ts) . "'";
-    $sql .= " AND datef <= '" . $db->idate($date_end_ts) . "'";
+    $sql .= " WHERE datec >= '" . $db->idate($date_start_ts) . "'";
+    $sql .= " AND datec <= '" . $db->idate($date_end_ts) . "'";
     $sql .= " AND fk_statut = " . Facture::STATUS_CLOSED;
     $sql .= " AND paye = 1";
     $sql .= " AND entity IN (" . getEntity('invoice') . ")";
@@ -145,8 +155,8 @@ if (!empty($date_start) && !empty($date_end) && $date_start_ts && $date_end_ts) 
     
     // 3. Total Unpaid Invoices (status validated)
     $sql = "SELECT SUM(total_ttc) as total FROM " . $db->prefix() . "facture";
-    $sql .= " WHERE datef >= '" . $db->idate($date_start_ts) . "'";
-    $sql .= " AND datef <= '" . $db->idate($date_end_ts) . "'";
+    $sql .= " WHERE datec >= '" . $db->idate($date_start_ts) . "'";
+    $sql .= " AND datec <= '" . $db->idate($date_end_ts) . "'";
     $sql .= " AND fk_statut = " . Facture::STATUS_VALIDATED;
     $sql .= " AND paye = 0";
     $sql .= " AND entity IN (" . getEntity('invoice') . ")";
@@ -160,8 +170,8 @@ if (!empty($date_start) && !empty($date_end) && $date_start_ts && $date_end_ts) 
     
     // 4. Total Expenses (approved + authorized + settled)
     $sql = "SELECT SUM(total_ttc) as total FROM " . $db->prefix() . "expensereport";
-    $sql .= " WHERE date_fin >= '" . $db->idate($date_start_ts) . "'";
-    $sql .= " AND date_fin <= '" . $db->idate($date_end_ts) . "'";
+    $sql .= " WHERE date_create >= '" . $db->idate($date_start_ts) . "'";
+    $sql .= " AND date_create <= '" . $db->idate($date_end_ts) . "'";
     $sql .= " AND status IN (" . ExpenseReport::STATUS_APPROVED . ", " . ExpenseReport::STATUS_CLOSED . ")";
     $sql .= " AND entity IN (" . getEntity('expensereport') . ")";
     
@@ -175,8 +185,8 @@ if (!empty($date_start) && !empty($date_end) && $date_start_ts && $date_end_ts) 
     // 5. Total 'Credit' Status Invoices (not paid yet - marked as credit but still unpaid)
     $sql = "SELECT SUM(f.total_ttc) as total";
     $sql .= " FROM " . $db->prefix() . "facture as f";
-    $sql .= " WHERE f.datef >= '" . $db->idate($date_start_ts) . "'";
-    $sql .= " AND f.datef <= '" . $db->idate($date_end_ts) . "'";
+    $sql .= " WHERE f.datec >= '" . $db->idate($date_start_ts) . "'";
+    $sql .= " AND f.datec <= '" . $db->idate($date_end_ts) . "'";
     $sql .= " AND f.fk_statut = " . Facture::STATUS_VALIDATED;  // Credit invoices are VALIDATED, not closed
     $sql .= " AND f.paye = 0";  // Not paid
     $sql .= " AND f.close_code = 'credit_status'";
@@ -193,8 +203,8 @@ if (!empty($date_start) && !empty($date_end) && $date_start_ts && $date_end_ts) 
     // Invoices that had "Credit" status (close_code = 'credit_status') and are now paid
     $sql = "SELECT SUM(f.total_ttc) as total";
     $sql .= " FROM " . $db->prefix() . "facture as f";
-    $sql .= " WHERE f.datef >= '" . $db->idate($date_start_ts) . "'";
-    $sql .= " AND f.datef <= '" . $db->idate($date_end_ts) . "'";
+    $sql .= " WHERE f.datec >= '" . $db->idate($date_start_ts) . "'";
+    $sql .= " AND f.datec <= '" . $db->idate($date_end_ts) . "'";
     $sql .= " AND f.fk_statut = " . Facture::STATUS_CLOSED;
     $sql .= " AND f.paye = 1";
     $sql .= " AND f.close_code = 'credit_status'";
@@ -211,8 +221,8 @@ if (!empty($date_start) && !empty($date_end) && $date_start_ts && $date_end_ts) 
     $sql = "SELECT f.rowid, f.ref, f.total_ttc, f.datef, s.nom as socname";
     $sql .= " FROM " . $db->prefix() . "facture as f";
     $sql .= " LEFT JOIN " . $db->prefix() . "societe as s ON f.fk_soc = s.rowid";
-    $sql .= " WHERE f.datef >= '" . $db->idate($date_start_ts) . "'";
-    $sql .= " AND f.datef <= '" . $db->idate($date_end_ts) . "'";
+    $sql .= " WHERE f.datec >= '" . $db->idate($date_start_ts) . "'";
+    $sql .= " AND f.datec <= '" . $db->idate($date_end_ts) . "'";
     $sql .= " AND f.fk_statut = " . Facture::STATUS_CLOSED;
     $sql .= " AND f.paye = 1";
     $sql .= " AND f.close_code = 'credit_status'";
